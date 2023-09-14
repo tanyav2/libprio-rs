@@ -32,9 +32,9 @@ sha2 = { version = "0.10.7", optional = true }
 sha3 = "0.10.8"
 subtle = "2.5.0"
 thiserror = "1.0"
-lambdaworks-math = { git = "https://github.com/lambdaclass/lambdaworks" }
-# lambdaworks-math = { git = "https://github.com/lambdaclass/lambdaworks", features = ["cuda"] }
-# lambdaworks-gpu = { git = "https://github.com/lambdaclass/lambdaworks", features = ["cuda"] }
+lambdaworks-math = { path = "lambdaworks/math" }
+# lambdaworks-math = { path = "lambdaworks/math", features = ["cuda"] }
+# lambdaworks-gpu = { path = "lambdaworks/gpu", features = ["cuda"] }
 
 [dev-dependencies]
 assert_matches = "1.5.0"
