@@ -1,0 +1,16 @@
+[workspace]
+members = ["no_gpu_fuzz", "metal_fuzz", "cuda_fuzz"]
+
+[workspace.package]
+edition = "2021"
+publish = false
+version = "0.1.1"
+
+[workspace.dependencies]
+lambdaworks-math = { path = "../math" }
+lambdaworks-gpu = { path = "../gpu" }
+libfuzzer-sys = "0.4"
+
+[profile.release]
+debug = 1
+
