@@ -19,7 +19,7 @@ use prio::dp::distributions::DiscreteGaussian;
 use prio::vdaf::prio2::Prio2;
 use prio::{
     benchmarked::*,
-    field::{random_vector, Field128 as F, FieldElement},
+    field::{random_vector, Field64 as F, FieldElement},
     flp::gadgets::Mul,
     vdaf::{prio3::Prio3, Aggregator, Client},
 };
@@ -109,6 +109,38 @@ fn poly_mul(c: &mut Criterion) {
 
             b.iter(|| {
                 benchmarked_gadget_mul_call_poly_direct(&mut g, &mut outp, &inp).unwrap();
+            })
+        });
+    }
+    group.finish();
+}
+
+/// CUDA version of the polynomial multiplication benchmark.
+fn poly_mul_cuda(c: &mut Criterion) {
+    // let test_sizes = [1_usize, 30, 60, 90, 120, 150];
+    let test_sizes = [1_usize];
+
+    let mut group = c.benchmark_group("poly_mul_cuda");
+    for size in test_sizes {
+        group.bench_with_input(BenchmarkId::new("fft", size), &size, |b, size| {
+            let m = (size + 1).next_power_of_two();
+            let mut g: Mul<F> = Mul::new(*size);
+            let mut outp = vec![F::zero(); 2 * m];
+            let inp = vec![random_vector(m).unwrap(); 2];
+
+            b.iter(|| {
+                benchmarked_gadget_mul_call_poly_fft(&mut g, &mut outp, &inp).unwrap();
+            })
+        });
+
+        group.bench_with_input(BenchmarkId::new("fft-cuda", size), &size, |b, size| {
+            let m = (size + 1).next_power_of_two();
+            let mut g: Mul<F> = Mul::new(*size);
+            let mut outp = vec![F::zero(); 2 * m];
+            let inp = vec![random_vector(m).unwrap(); 2];
+
+            b.iter(|| {
+                benchmarked_gadget_mul_call_poly_fft_cuda(&mut g, &mut outp, &inp).unwrap();
             })
         });
     }
@@ -865,12 +897,31 @@ fn poplar1_generate_zipf_distributed_batch(
 }
 
 #[cfg(all(feature = "prio2", feature = "experimental"))]
-criterion_group!(benches, poplar1, prio3, prio2, poly_mul, prng, idpf, dp_noise);
+criterion_group!(
+    benches,
+    poplar1,
+    prio3,
+    prio2,
+    poly_mul,
+    poly_mul_cuda,
+    prng,
+    idpf,
+    dp_noise
+);
 #[cfg(all(not(feature = "prio2"), feature = "experimental"))]
-criterion_group!(benches, poplar1, prio3, poly_mul, prng, idpf, dp_noise);
+criterion_group!(
+    benches,
+    poplar1,
+    prio3,
+    poly_mul,
+    poly_mul_cuda,
+    prng,
+    idpf,
+    dp_noise
+);
 #[cfg(all(feature = "prio2", not(feature = "experimental")))]
-criterion_group!(benches, prio3, prio2, prng, poly_mul);
+criterion_group!(benches, prio3, prio2, prng, poly_mul, poly_mul_cuda);
 #[cfg(all(not(feature = "prio2"), not(feature = "experimental")))]
-criterion_group!(benches, prio3, prng, poly_mul);
+criterion_group!(benches, prio3, prng, poly_mul, poly_mul_cuda);
 
 criterion_main!(benches);

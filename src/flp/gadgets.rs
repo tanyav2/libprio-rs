@@ -2,7 +2,10 @@
 
 //! A collection of gadgets.
 
-use crate::fft::{discrete_fourier_transform, discrete_fourier_transform_inv_finish};
+use crate::fft::{
+    discrete_fourier_transform, discrete_fourier_transform_cuda,
+    discrete_fourier_transform_inv_cuda, discrete_fourier_transform_inv_finish,
+};
 use crate::field::FftFriendlyFieldElement;
 use crate::flp::{gadget_poly_len, wire_poly_len, FlpError, Gadget};
 use crate::polynomial::{poly_deg, poly_eval, poly_mul};
@@ -68,6 +71,27 @@ impl<F: FftFriendlyFieldElement> Mul<F> {
 
         discrete_fourier_transform(outp, &buf, n)?;
         discrete_fourier_transform_inv_finish(outp, n, self.n_inv);
+        Ok(())
+    }
+
+    // Multiply input polynomials using FFT with CUDA.
+    pub(crate) fn call_poly_fft_cuda(
+        &mut self,
+        outp: &mut [F],
+        inp: &[Vec<F>],
+    ) -> Result<(), FlpError> {
+        let n = self.n;
+        let mut buf = vec![F::zero(); n];
+
+        discrete_fourier_transform_cuda(&mut buf, &inp[0], n)?;
+        discrete_fourier_transform_cuda(outp, &inp[1], n)?;
+
+        for i in 0..n {
+            buf[i] *= outp[i];
+        }
+
+        discrete_fourier_transform_inv_cuda(outp, &buf, n)?;
+
         Ok(())
     }
 }

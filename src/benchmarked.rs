@@ -40,6 +40,16 @@ pub fn benchmarked_gadget_mul_call_poly_fft<F: FftFriendlyFieldElement>(
 }
 
 /// Sets `outp` to `inp[0] * inp[1]`, where `inp[0]` and `inp[1]` are polynomials. This function
+/// uses FFT for multiplication.
+pub fn benchmarked_gadget_mul_call_poly_fft_cuda<F: FftFriendlyFieldElement>(
+    g: &mut Mul<F>,
+    outp: &mut [F],
+    inp: &[Vec<F>],
+) -> Result<(), FlpError> {
+    g.call_poly_fft_cuda(outp, inp)
+}
+
+/// Sets `outp` to `inp[0] * inp[1]`, where `inp[0]` and `inp[1]` are polynomials. This function
 /// does the multiplication directly.
 pub fn benchmarked_gadget_mul_call_poly_direct<F: FftFriendlyFieldElement>(
     g: &mut Mul<F>,
