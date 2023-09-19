@@ -117,8 +117,7 @@ fn poly_mul(c: &mut Criterion) {
 
 /// CUDA version of the polynomial multiplication benchmark.
 fn poly_mul_cuda(c: &mut Criterion) {
-    // let test_sizes = [1_usize, 30, 60, 90, 120, 150];
-    let test_sizes = [1_usize];
+    let test_sizes = [1_usize, 30, 60, 90, 120, 150, 1000, 10000];
 
     let mut group = c.benchmark_group("poly_mul_cuda");
     for size in test_sizes {

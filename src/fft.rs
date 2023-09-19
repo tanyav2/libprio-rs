@@ -119,16 +119,17 @@ pub fn discrete_fourier_transform_cuda<F: FftFriendlyFieldElement>(
     inp: &[F],
     size: usize,
 ) -> Result<(), FftError> {
-    let lambda_field_elements: Vec<element::FieldElement<U64TestField>> = inp
-        .to_vec()
-        .iter()
-        .map(|x| prio_to_lambda_field(x))
-        .collect();
+    let lambda_field_elements: Vec<element::FieldElement<U64TestField>> =
+        inp.iter().map(prio_to_lambda_field).collect();
     let poly = Polynomial::new(&lambda_field_elements);
     let blowup_factor = size / lambda_field_elements.len();
     let lambda_out = poly.evaluate_fft(blowup_factor, None).unwrap();
-    let out: Vec<F> = lambda_out.iter().map(|x| lambda_to_prio_field(x)).collect();
-    outp.copy_from_slice(&out);
+    outp.copy_from_slice(
+        &lambda_out
+            .iter()
+            .map(lambda_to_prio_field)
+            .collect::<Vec<F>>(),
+    );
 
     Ok(())
 }
@@ -153,18 +154,16 @@ pub(crate) fn discrete_fourier_transform_inv_cuda<F: FftFriendlyFieldElement>(
     inp: &[F],
     size: usize,
 ) -> Result<(), FftError> {
-    let lambda_field_elements: Vec<element::FieldElement<U64TestField>> = inp
-        .to_vec()
-        .into_iter()
-        .map(|x| prio_to_lambda_field(&x))
-        .collect();
+    let lambda_field_elements: Vec<element::FieldElement<U64TestField>> =
+        inp.iter().map(prio_to_lambda_field).collect();
     let lambda_out = interpolate_fft_cpu(&lambda_field_elements).unwrap();
-    let coeffs = lambda_out.coefficients();
-    let out: Vec<F> = coeffs
-        .into_iter()
-        .map(|x| lambda_to_prio_field(x))
-        .collect();
-    outp.clone_from_slice(&out);
+    outp.copy_from_slice(
+        &lambda_out
+            .coefficients()
+            .iter()
+            .map(lambda_to_prio_field)
+            .collect::<Vec<F>>(),
+    );
     Ok(())
 }
 
