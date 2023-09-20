@@ -9,7 +9,7 @@ use crate::fp::{log2, MAX_ROOTS};
 // use crate::lambdaworks_math::fft::gpu::cuda::{evaluate_fft_cuda, interpolate_fft_cuda};
 use lambdaworks_math::fft::polynomial::{interpolate_fft_cpu, FFTPoly};
 use lambdaworks_math::field::element;
-use lambdaworks_math::field::test_fields::u64_test_field::U64TestField;
+use lambdaworks_math::field::fields::fft_friendly::u64_test_field::U64TestField;
 use lambdaworks_math::polynomial::Polynomial;
 use std::convert::TryFrom;
 

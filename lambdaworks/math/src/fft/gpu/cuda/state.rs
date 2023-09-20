@@ -2,6 +2,7 @@ use crate::{
     field::{
         element::FieldElement,
         fields::fft_friendly::stark_252_prime_field::Stark252PrimeField,
+        fields::fft_friendly::u64_test_field::U64TestField,
         traits::{IsFFTField, IsField, RootsConfig},
     },
     gpu::cuda::field::element::CUDAFieldElement,
@@ -16,6 +17,7 @@ use lambdaworks_gpu::cuda::abstractions::errors::CudaError;
 use std::sync::Arc;
 
 const STARK256_PTX: &str = include_str!("../../../gpu/cuda/shaders/field/stark256.ptx");
+const FP64_PTX: &str = include_str!("../../../gpu/cuda/shaders/field/fp64.ptx");
 const WARP_SIZE: usize = 32; // the implementation will spawn threadblocks of this size.
 
 /// Structure for abstracting basic calls to a CUDA device and saving the state. Used for
@@ -33,6 +35,7 @@ impl CudaState {
 
         // Load PTX libraries
         state.load_library::<Stark252PrimeField>(STARK256_PTX)?;
+        state.load_library::<U64TestField>(FP64_PTX)?;
 
         Ok(state)
     }

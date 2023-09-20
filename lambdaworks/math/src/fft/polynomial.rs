@@ -73,7 +73,7 @@ impl<F: IsFFTField> FFTPoly<F> for Polynomial<FieldElement<F>> {
         #[cfg(feature = "cuda")]
         {
             // TODO: support multiple fields with CUDA
-            if F::field_name() == "stark256" {
+            if F::field_name() == "stark256" || F::field_name() == "fp64" {
                 Ok(evaluate_fft_cuda(&coeffs)?)
             } else {
                 evaluate_fft_cpu(&coeffs)

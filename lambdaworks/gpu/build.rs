@@ -28,12 +28,12 @@ fn compile_cuda_shaders() {
             );
 
             Command::new("nvcc")
+                .arg("-g")
+                .arg("-G")
                 .arg("-ptx")
                 .arg(entry.path())
                 .arg("-o")
                 .arg(out_path)
-                .arg("-ccbin")
-                .arg("clang-9")
                 .spawn()
                 .unwrap()
         })

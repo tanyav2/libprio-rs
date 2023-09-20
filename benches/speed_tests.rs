@@ -121,16 +121,16 @@ fn poly_mul_cuda(c: &mut Criterion) {
 
     let mut group = c.benchmark_group("poly_mul_cuda");
     for size in test_sizes {
-        group.bench_with_input(BenchmarkId::new("fft", size), &size, |b, size| {
-            let m = (size + 1).next_power_of_two();
-            let mut g: Mul<F> = Mul::new(*size);
-            let mut outp = vec![F::zero(); 2 * m];
-            let inp = vec![random_vector(m).unwrap(); 2];
+        // group.bench_with_input(BenchmarkId::new("fft", size), &size, |b, size| {
+        //     let m = (size + 1).next_power_of_two();
+        //     let mut g: Mul<F> = Mul::new(*size);
+        //     let mut outp = vec![F::zero(); 2 * m];
+        //     let inp = vec![random_vector(m).unwrap(); 2];
 
-            b.iter(|| {
-                benchmarked_gadget_mul_call_poly_fft(&mut g, &mut outp, &inp).unwrap();
-            })
-        });
+        //     b.iter(|| {
+        //         benchmarked_gadget_mul_call_poly_fft(&mut g, &mut outp, &inp).unwrap();
+        //     })
+        // });
 
         group.bench_with_input(BenchmarkId::new("fft-cuda", size), &size, |b, size| {
             let m = (size + 1).next_power_of_two();
